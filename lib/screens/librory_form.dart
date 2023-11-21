@@ -1,5 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:librory/screens/menu.dart';
 import 'package:librory/widgets/left_drawer.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 
 class LibroryFormPage extends StatefulWidget {
   const LibroryFormPage({super.key});
@@ -12,10 +19,14 @@ class _ShopFormPageState extends State<LibroryFormPage> {
   final _formKey = GlobalKey<FormState>();
   String _name = "";
   int _amount = 0;
+  int _rented = 0;
+  String _category = "";
   String _description = "";
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Center(
@@ -87,6 +98,57 @@ class _ShopFormPageState extends State<LibroryFormPage> {
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
                 decoration: InputDecoration(
+                  hintText: "Jumlah Buku Dipinjam",
+                  labelText: "Jumlah Buku Dipinjam",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
+                ),
+                // Tambahkan variabel yang sesuai
+                onChanged: (String? value) {
+                  setState(() {
+                    _rented = int.parse(value!);
+                  });
+                },
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return "Jumlah buku dipinjam tidak boleh kosong!";
+                  }
+                  if (int.tryParse(value) == null) {
+                    return "Jumlah buku dipinjam harus berupa angka!";
+                  }
+                  return null;
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                decoration: InputDecoration(
+                  hintText: "Kategori",
+                  labelText: "Kategori",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
+                ),
+                onChanged: (String? value) {
+                  setState(() {
+                    // Tambahkan variabel yang sesuai
+                    _category = value!;
+                  });
+                },
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return "Kategori tidak boleh kosong!";
+                  }
+                  return null;
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                decoration: InputDecoration(
                   hintText: "Deskripsi",
                   labelText: "Deskripsi",
                   border: OutlineInputBorder(
@@ -115,36 +177,34 @@ class _ShopFormPageState extends State<LibroryFormPage> {
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(Colors.indigo),
                   ),
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: const Text('Buku berhasil tersimpan'),
-                            content: SingleChildScrollView(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Memunculkan value-value lainnya
-                                  Text('Judul Buku: $_name'),
-                                  Text('Jumlah Buku: $_amount'),
-                                  Text('Deskripsi: $_description'),
-                                ],
-                              ),
-                            ),
-                            actions: [
-                              TextButton(
-                                child: const Text('OK'),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                      _formKey.currentState!.reset();
+                      // Kirim ke Django dan tunggu respons
+                      final response = await request.postJson(
+                          "http://127.0.0.1:8000/create-flutter/",
+                          jsonEncode(<String, String>{
+                            'name': _name,
+                            'amount': _amount.toString(),
+                            'rented': _rented.toString(),
+                            'category': _category,
+                            'description': _description,
+                          }));
+                      if (response['status'] == 'success') {
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(
+                          content: Text("Buku baru berhasil disimpan!"),
+                        ));
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => MyHomePage()),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(
+                          content:
+                              Text("Terdapat kesalahan, silakan coba lagi."),
+                        ));
+                      }
                     }
                   },
                   child: const Text(

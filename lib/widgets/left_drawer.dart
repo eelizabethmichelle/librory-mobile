@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:librory/screens/librory_form.dart';
+import 'package:librory/screens/list_product.dart';
 import 'package:librory/screens/menu.dart';
 
 class LeftDrawer extends StatelessWidget {
@@ -17,7 +18,7 @@ class LeftDrawer extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  'Shopping List',
+                  'Librory',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 30,
@@ -27,7 +28,7 @@ class LeftDrawer extends StatelessWidget {
                 ),
                 Padding(padding: EdgeInsets.all(10)),
                 Text(
-                  "Catat seluruh keperluan belanjamu di sini!",
+                  "Catat seluruh bukumu di sini!",
                   // Menambahkan gaya teks dengan center alignment, font ukuran 15, warna putih, dan weight biasa
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -62,6 +63,17 @@ class LeftDrawer extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (context) => const LibroryFormPage(),
                   ));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.shopping_basket),
+            title: const Text('Daftar Buku'),
+            onTap: () {
+              // Route menu ke halaman produk
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProductPage()),
+              );
             },
           ),
         ],
