@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, duplicate_ignore
 
 import 'package:flutter/material.dart';
 import 'package:librory/screens/librory_form.dart';
@@ -66,6 +66,7 @@ class LibroryCard extends StatelessWidget {
               );
             } else {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                // ignore: unnecessary_string_interpolations
                 content: Text("$message"),
               ));
             }
