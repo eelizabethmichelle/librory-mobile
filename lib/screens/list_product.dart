@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:librory/models/product.dart';
+import 'package:librory/screens/detail_product.dart';
 import 'package:librory/widgets/left_drawer.dart';
 
 class ProductPage extends StatefulWidget {
@@ -60,35 +61,47 @@ class _ProductPageState extends State<ProductPage> {
                   );
                 } else {
                   return ListView.builder(
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (_, index) => Container(
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 12),
-                            padding: const EdgeInsets.all(20.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "${snapshot.data![index].fields.name}",
-                                  style: const TextStyle(
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                Text("${snapshot.data![index].fields.amount}"),
-                                const SizedBox(height: 10),
-                                Text("${snapshot.data![index].fields.rented}"),
-                                const SizedBox(height: 10),
-                                Text(
-                                    "${snapshot.data![index].fields.category}"),
-                                const SizedBox(height: 10),
-                                Text(
-                                    "${snapshot.data![index].fields.description}")
-                              ],
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (_, index) {
+                      // Mengambil data produk saat ini
+                      var product = snapshot.data![index];
+
+                      return InkWell(
+                        onTap: () {
+                          // Navigasi ke halaman detail produk dengan data produk
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  ProductDetailPage(product: product),
                             ),
-                          ));
+                          );
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                product.fields.name,
+                                style: const TextStyle(
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Text("Amount: ${product.fields.amount}"),
+                              const SizedBox(height: 10),
+                              Text("Written by: ${product.fields.description}"),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
                 }
               }
             }));
